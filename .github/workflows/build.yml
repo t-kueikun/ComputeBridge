@@ -1,0 +1,26 @@
+name: Build
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  macos:
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install XcodeGen
+        run: brew install xcodegen
+      - name: Generate Xcode project
+        run: xcodegen generate
+      - name: Build macOS app
+        run: >-
+          xcodebuild
+          -project ComputeBridge.xcodeproj
+          -scheme ComputeBridgeMac
+          -destination 'platform=macOS'
+          CODE_SIGNING_ALLOWED=NO
+          build
+      - name: Check transfer script
+        run: python3 -m py_compile scripts/send-next-project.py

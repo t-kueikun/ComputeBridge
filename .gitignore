@@ -1,0 +1,17 @@
+.DS_Store
+DerivedData/
+build/
+graphify-out/
+
+*.xcuserstate
+*.xccheckout
+*.xcscmblueprint
+xcuserdata/
+
+.env
+.env.*
+!.env.example
+
+__pycache__/
+*.pyc
+*.log

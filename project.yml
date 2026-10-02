@@ -1,0 +1,119 @@
+name: ComputeBridge
+options:
+  bundleIdPrefix: dev.computebridge
+  deploymentTarget:
+    macOS: "14.0"
+    iOS: "17.0"
+targets:
+  ComputeBridgeMac:
+    type: application
+    platform: macOS
+    sources:
+      - path: ComputeBridge/Shared
+      - path: ComputeBridge/Mac
+      - path: scripts
+        type: folder
+    info:
+      path: Config/Mac-Info.plist
+      properties:
+        CFBundleDisplayName: ComputeBridge
+        NSCameraUsageDescription: Scan the ComputeBridge pairing QR code shown on your iPhone.
+        NSLocalNetworkUsageDescription: Connect to nearby ComputeBridge workers on your local network.
+        NSBonjourServices:
+          - _computebridge._tcp
+          - _http._tcp
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: dev.computebridge.mac
+        PRODUCT_NAME: ComputeBridge
+        SWIFT_VERSION: 6.0
+        GENERATE_INFOPLIST_FILE: YES
+        CODE_SIGN_ENTITLEMENTS: ComputeBridge/Mac/ComputeBridgeMac.entitlements
+        ENABLE_APP_SANDBOX: YES
+        ENABLE_OUTGOING_NETWORK_CONNECTIONS: YES
+        ENABLE_INCOMING_NETWORK_CONNECTIONS: YES
+  ComputeBridgeiOS:
+    type: application
+    platform: iOS
+    sources:
+      - path: ComputeBridge/Shared
+      - path: ComputeBridge/iOS
+      - path: ComputeBridge/NodeProbe/NodeRuntimeModel.swift
+      - path: ComputeBridge/NodeProbe/Runtime
+        type: folder
+    dependencies:
+      - framework: Vendor/NodeMobile.xcframework
+        embed: true
+        codeSign: true
+    info:
+      path: Config/iOS-Info.plist
+      properties:
+        CFBundleDisplayName: ComputeBridge Worker
+        NSLocalNetworkUsageDescription: Allow nearby Macs to discover and use this iPhone as a ComputeBridge worker.
+        NSBonjourServices:
+          - _computebridge._tcp
+          - _http._tcp
+        NSAppTransportSecurity:
+          NSAllowsLocalNetworking: true
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: dev.computebridge.ios
+        PRODUCT_NAME: ComputeBridge Worker
+        INFOPLIST_KEY_UILaunchStoryboardName: LaunchScreen
+        INFOPLIST_KEY_UIRequiresFullScreen: YES
+        SWIFT_VERSION: 6.0
+        GENERATE_INFOPLIST_FILE: YES
+        TARGETED_DEVICE_FAMILY: "1,2"
+        CODE_SIGN_STYLE: Automatic
+  ComputeBridgeNodeProbe:
+    type: application
+    platform: iOS
+    sources:
+      - path: ComputeBridge/NodeProbe
+        excludes:
+          - Runtime
+      - path: ComputeBridge/NodeProbe/Runtime
+        type: folder
+    dependencies:
+      - framework: Vendor/NodeMobile.xcframework
+        embed: true
+        codeSign: true
+    info:
+      path: Config/NodeProbe-Info.plist
+      properties:
+        CFBundleDisplayName: Next.js on iPhone
+        NSLocalNetworkUsageDescription: Check whether an embedded Node.js server can run on this iPhone.
+        NSAppTransportSecurity:
+          NSAllowsLocalNetworking: true
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: dev.computebridge.nodeprobe
+        PRODUCT_NAME: NodeProbe
+        INFOPLIST_KEY_UIRequiresFullScreen: YES
+        SWIFT_VERSION: 6.0
+        GENERATE_INFOPLIST_FILE: YES
+        TARGETED_DEVICE_FAMILY: "1,2"
+        CODE_SIGN_STYLE: Automatic
+schemes:
+  ComputeBridgeMac:
+    build:
+      targets:
+        ComputeBridgeMac: all
+    run:
+      config: Debug
+    archive:
+      config: Release
+  ComputeBridgeiOS:
+    build:
+      targets:
+        ComputeBridgeiOS: all
+    run:
+      config: Debug
+    archive:
+      config: Release
+  ComputeBridgeNodeProbe:
+    build:
+      targets:
+        ComputeBridgeNodeProbe: all
+    run:
+      config: Debug
