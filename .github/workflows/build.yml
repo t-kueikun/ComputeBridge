@@ -9,7 +9,7 @@ jobs:
   macos:
     runs-on: macos-15
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Install XcodeGen
         run: brew install xcodegen
       - name: Generate Xcode project
@@ -21,6 +21,16 @@ jobs:
           -scheme ComputeBridgeMac
           -destination 'platform=macOS'
           CODE_SIGNING_ALLOWED=NO
+          build
+      - name: Build iOS Simulator app
+        run: >-
+          xcodebuild
+          -project ComputeBridge.xcodeproj
+          -scheme ComputeBridgeiOS
+          -sdk iphonesimulator
+          -arch arm64
+          CODE_SIGNING_ALLOWED=NO
+          ONLY_ACTIVE_ARCH=YES
           build
       - name: Check transfer script
         run: python3 -m py_compile scripts/send-next-project.py
