@@ -98,28 +98,29 @@ final class WorkerModel: ObservableObject {
             status = "Computing…"
             recentJob = "Monte Carlo π · \(job.iterations.formatted()) samples"
             pipe?.send(BridgeMessage(kind: .jobAccepted, jobID: job.id))
-            Task.detached(priority: .userInitiated) { [weak self] in
-                let result = PiComputer.run(job)
-                await MainActor.run {
-                    self?.completedJobs += 1
-                    self?.status = "Connected · Ready"
-                    self?.recentJob = "π ≈ \(result.estimate.formatted(.number.precision(.fractionLength(6)))) · \(result.elapsedSeconds.formatted(.number.precision(.fractionLength(2))))s"
-                    self?.pipe?.send(BridgeMessage(kind: .jobResult, result: result, jobID: job.id))
-                }
+            Task { [weak self] in
+                let result = await Task.detached(priority: .userInitiated) {
+                    PiComputer.run(job)
+                }.value
+                guard let self else { return }
+                self.completedJobs += 1
+                self.status = "Connected · Ready"
+                self.recentJob = "π ≈ \(result.estimate.formatted(.number.precision(.fractionLength(6)))) · \(result.elapsedSeconds.formatted(.number.precision(.fractionLength(2))))s"
+                self.pipe?.send(BridgeMessage(kind: .jobResult, result: result, jobID: job.id))
             }
         case .runJS:
             guard let script = message.script, let requestID = message.requestID else { return }
             status = "Running JavaScript…"
             recentJob = "JavaScript · (script.prefix(50))"
-            Task.detached(priority: .userInitiated) { [weak self] in
-                let result = WorkerJavaScriptRuntime.evaluate(script)
-                await MainActor.run {
-                    guard let self else { return }
-                    self.status = "Connected · Ready"
-                    self.recentJob = "JavaScript finished"
-                    self.pipe?.send(BridgeMessage(kind: .jsResult, error: result.error,
-                                                  requestID: requestID, output: result.output))
-                }
+            Task { [weak self] in
+                let result = await Task.detached(priority: .userInitiated) {
+                    WorkerJavaScriptRuntime.evaluate(script)
+                }.value
+                guard let self else { return }
+                self.status = "Connected · Ready"
+                self.recentJob = "JavaScript finished"
+                self.pipe?.send(BridgeMessage(kind: .jsResult, error: result.error,
+                                              requestID: requestID, output: result.output))
             }
         case .cancelJob:
             status = "Connected · Ready"
