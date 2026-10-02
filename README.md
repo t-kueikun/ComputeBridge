@@ -1,16 +1,18 @@
 # ComputeBridge
 
+日本語 | [English](README.en.md)
+
 [![Build](https://github.com/t-kueikun/ComputeBridge/actions/workflows/build.yml/badge.svg)](https://github.com/t-kueikun/ComputeBridge/actions/workflows/build.yml)
 
 **近くのAppleデバイスへ計算Jobを分散する、Mac / iPhone向け実験アプリ。**
 
 MacをCoordinator、iPhoneをWorkerとして、Monte Carlo法でπを推定するJobをローカルネットワーク経由で実行します。Mac上の他のアプリやメモリを別端末へ移すものではなく、ComputeBridgeに明示的に渡した計算だけを分散します。
 
-> Experimental: ComputeBridge also runs supported Next.js 15/16 development servers inside an embedded Node.js 24 runtime on an iPhone. It is not a general-purpose process, CPU, or RAM offload layer.
+> 実験機能：ComputeBridgeは、iPhoneに組み込んだNode.js 24ランタイム上で、対応するNext.js 15 / 16の開発サーバーも実行できます。任意のプロセス、CPU処理、RAMを汎用的にオフロードする仕組みではありません。
 
-## Quick start (English)
+## クイックスタート
 
-Requirements: Xcode 16+, macOS 14+, iOS 17+, and [XcodeGen](https://github.com/yonaskolb/XcodeGen).
+必要環境：Xcode 16以降、macOS 14以降、iOS 17以降、[XcodeGen](https://github.com/yonaskolb/XcodeGen)。
 
 ```sh
 git clone https://github.com/t-kueikun/ComputeBridge.git
@@ -20,9 +22,9 @@ xcodegen generate
 open ComputeBridge.xcodeproj
 ```
 
-Run the `ComputeBridgeMac` scheme on the Mac. To install the Worker on a physical iPhone, select the `ComputeBridgeiOS` target, choose your Apple Development team, and change the bundle identifier if Xcode reports that the default identifier is unavailable. Allow Local Network access in both apps and keep the iPhone app in the foreground while it is working.
+Macでは`ComputeBridgeMac`スキームを実行します。実機iPhoneへWorkerをインストールするには、`ComputeBridgeiOS`ターゲットを選び、自分のApple Development Teamを設定します。既定のBundle IDが使用できないとXcodeに表示された場合は、Bundle IDを変更してください。両方のアプリでローカルネットワークへのアクセスを許可し、処理中はiPhoneアプリを前面に表示しておきます。
 
-The repository includes the NodeMobile XCFramework and the SWC WASM runtime required by the prototype. Their licenses are stored under `Vendor` and `ComputeBridge/NodeProbe/Runtime/swc-wasm-nodejs`.
+このリポジトリには、試作機能に必要なNodeMobile XCFrameworkとSWC WASMランタイムが含まれます。それぞれのライセンスは`Vendor`と`ComputeBridge/NodeProbe/Runtime/swc-wasm-nodejs`にあります。
 
 ## 実装した機能
 
@@ -99,6 +101,6 @@ ComputeBridge/
 
 `project.yml`がXcodeGenのプロジェクト定義です。Mac、Worker、シミュレータ試作用NodeProbeの3ターゲットは同じXcodeプロジェクト内にあります。実機では`ComputeBridgeiOS`を使います。初回は自分のApple Development Teamを選択し、必要に応じて`project.yml`のBundle IDを変更してから`xcodegen generate`を再実行してください。Node iOSフレームワークとライセンスは`Vendor`、転送スクリプトは`scripts`にあります。
 
-## License
+## ライセンス
 
 ComputeBridgeの独自コードは[MIT License](LICENSE)で公開しています。同梱する第三者コンポーネントには、それぞれのライセンスが適用されます。
